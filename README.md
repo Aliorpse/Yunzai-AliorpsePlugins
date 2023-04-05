@@ -13,7 +13,6 @@
 `#motd [IP(Port)]`：获取mc服务器状态信息
 
 ![Example1](XTY0Y26_P%7DK50%60294J2ITFO.png)
-![example2](C)W8~_%7BRRPTRNA%7B5)3O$%5BMR.png)
 
 例如: 
 
