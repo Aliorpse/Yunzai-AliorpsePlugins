@@ -25,12 +25,10 @@
 #### 须知
 
 1.  学业繁忙,Issue与PR不及时回
-2.  本插件使用自行开发的MOTD获取API,访问地址:
+2.  本插件使用自行开发的MOTD获取API不限次数，被打就关 (逃,访问地址:
 http://123.60.141.159/?ip=[服务器IP]&port=[服务器端口]
-
-Lib:
+3.  Lib:
 https://github.com/xPaw/PHP-Minecraft-Query
-不限次数，被打就关 (逃
 
 #### 参与贡献
 1.  Fork 本仓库
