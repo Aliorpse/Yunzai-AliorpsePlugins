@@ -30,7 +30,7 @@ export class McMotd extends plugin {
             ip = port
             port = 25565
         }
-        let res = await fetch("http://123.60.141.159/?ip=" + ip + "&port=" + port)
+        let res = await fetch("http://123.60.141.159/api/mcPing?ip=" + ip + "&port=" + port)
         if (!res) { return false }
         res = await res.json()
         if (res.hasOwnProperty("errMessage") === true) {
