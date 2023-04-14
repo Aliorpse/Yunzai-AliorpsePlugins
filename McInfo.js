@@ -1,3 +1,10 @@
+/**
+插件作者3521766148
+开源地址https://gitee.com/Aliorpse/Yunzai-McMotd/
+
+使用教程:
+#mcinfo [Name] / 获取Java正版玩家信息
+*/
 import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import fetch from 'node-fetch'
