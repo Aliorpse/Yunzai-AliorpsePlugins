@@ -1,5 +1,12 @@
-//插件作者3521766148
-//开源地址https://gitee.com/Aliorpse/Yunzai-McMotd/
+/**
+插件作者3521766148
+开源地址https://gitee.com/Aliorpse/Yunzai-McMotd/
+
+使用教程:
+#motd [IP] / 获取服务器状态
+支持输入端口,例如mc.hypixel.net,mc.hypixel.net:25565都是合法的
+如果不输入端口默认端口为25565
+*/
 import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import { segment } from "oicq"
