@@ -2,6 +2,7 @@
 //开源地址https://gitee.com/Aliorpse/Yunzai-McMotd/
 import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
+import fetch from 'node-fetch'
 import { segment } from "oicq"
 const _path = process.cwd();
 
