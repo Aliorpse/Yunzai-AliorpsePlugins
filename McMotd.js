@@ -38,7 +38,10 @@ export class McMotd extends plugin {
             ip = port
             port = 25565
         }
+        let startime = performance.now()
         let res = await fetch("http://123.60.141.159/api/mcPing?ip=" + ip + "&port=" + port)
+        let endtime = performance.now()
+        let ms = `${(endtime - startime).toFixed(3)}`;
         if (!res) { return false }
         res = await res.json()
         logger.mark(`${res}`)
@@ -75,6 +78,7 @@ export class McMotd extends plugin {
                 `\n[协议] ${res.version.protocol}`,
                 `\n[类型] ${type}`,
                 `\n[玩家] ${res.players.online}/${res.players.max}`,
+                `\n[请求耗时] ${ms}ms`,
             ]
             e.reply(message, true)
         } else {
@@ -99,6 +103,7 @@ export class McMotd extends plugin {
                 `\n[协议] ${res.version.protocol}`,
                 `\n[类型] ${type}`,
                 `\n[玩家] ${res.players.online}/${res.players.max}`,
+                `\n[请求耗时] ${ms}ms`,
             ]
             e.reply(message, true)
         }
