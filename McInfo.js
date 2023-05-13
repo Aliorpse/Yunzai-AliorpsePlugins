@@ -7,8 +7,8 @@
 */
 import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
+import { segment } from "oicq"
 import fetch from 'node-fetch'
-const _path = process.cwd();
 
 export class McInfo extends plugin {
   constructor () {
@@ -30,44 +30,34 @@ export class McInfo extends plugin {
 
   async getInfo (e) {
     const content = e.message[0].text.slice(8)
-    if (content == "") return
-    let res = await fetch("https://api.mojang.com/users/profiles/minecraft/"+content)
+    if (content == "") {
+      e.reply(
+        `用法:#mcinfo [PlayerName]`
+      ,true)
+      return
+    }
+    let res = await fetch("https://playerdb.co/api/player/minecraft/"+content, {
+      headers:{
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
+    }
+    })
     if (!res) { return false }
     res = await res.json()
-    if(res.hasOwnProperty("errorMessage") === true){
-      if(res.errorMessage == "Couldn't find any profile with that name"){
-        e.reply("无法找到该玩家，请检查输入信息",true)
-      }else{
-        e.reply(res.errorMessage,true)
-      }
+    if(res.code == "player.found"){
+      let skin = await fetch(`http://minecraft-api.com/api/skins/${res.data.player.username}/body/10.5/10/10/25/3`)
+      skin = await skin.text();
+      skin = skin.replace(/<img src="data:image\/png\;base64, /,"").replace(/" alt="Minecraft-API.com skin player" \/>/, "")
+      const message = [
+        `MC正版玩家查询\n----`,
+        `\n[玩家] ${res.data.player.username}`,
+        `\n[UUID] ${res.data.player.id}`,
+        `\n[皮肤]`,
+        segment.image(`base64://${skin}`),
+      ]
+      e.reply(message,true)
     }else{
-      let res2 = await fetch("https://sessionserver.mojang.com/session/minecraft/profile/"+res.id)
-      res2 = await res2.json()
-      let res3 = Buffer.from(res2.properties[0].value, 'base64');
-      res3 = JSON.parse(res3)
-      let skin = res3.textures.SKIN
-      let cape = res3.textures.CAPE
-      if(res3.textures.hasOwnProperty("CAPE") === true){
-        const message = [
-          `MC正版玩家查询\n----`,
-          `\n[Player] ${res.name}`,
-          `\n[UUID] ${res.id}`,
-          `\n[皮肤]`,
-          segment.image(skin.url),
-          `\n[披风]`,
-          segment.image(cape.url),
-        ]
-        e.reply(message,true)
-      }else{
-        const message = [
-          `MC正版玩家查询\n----`,
-          `\n[Player] ${res.name}`,
-          `\n[UUID] ${res.id}`,
-          `\n[皮肤]`,
-          segment.image(skin.url),
-        ]
-        e.reply(message,true)
-      }
+      if(res.message == "Mojang API lookup failed.") e.reply("错误: 未找到该玩家",true)
+      else e.reply("错误: "+ res.message,true)
     }
   }
 }
