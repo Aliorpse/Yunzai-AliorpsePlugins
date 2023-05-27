@@ -1,3 +1,8 @@
+/**
+Hypixel查询插件
+用法:#hyp [playername]
+用户数据缓存:Yunzai-Bot/data/hypInfo/PlayerData
+*/
 import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import * as fs from 'fs'
