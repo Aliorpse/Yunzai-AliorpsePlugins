@@ -11,7 +11,15 @@ import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import { segment } from "oicq"
 import fetch from 'node-fetch'
-const _path = process.cwd();
+import fs from "fs"
+
+
+if (!fs.existsSync("./data/McMotd/SAlias.json")) {
+    fs.mkdirSync("./data/McMotd")
+    fs.writeFileSync("./data/McMotd/SAlias.json","{}")
+}
+
+
 
 export class McMotd extends plugin {
     constructor() {
@@ -22,16 +30,52 @@ export class McMotd extends plugin {
             priority: 5000,
             rule: [
                 {
-                    reg: '#motd.*$',
+                    reg: '#motd',
                     fnc: 'getMotd'
+                },
+                {
+                    reg: '#mcsadd',
+                    fnc: 'addAlias'
                 }
             ]
         })
     }
-
+    async addAlias(e) {
+        var alias = fs.readFileSync("./data/McMotd/SAlias.json")
+        alias = eval("(" + alias + ")")
+        const content = e.message[0].text.slice(8)
+        if (content == "") {
+            e.reply('用法: #mcsadd [IP Address],仅限群聊',true)
+            return
+        }
+        if(!e.isGroup) { 
+            e.reply('该功能仅限群聊',true)
+            return
+        }
+        if((e.sender.role == "admin" || e.sender.role == "owner")) {
+            alias[`${e.group_id}`] = content
+            fs.writeFileSync("./data/McMotd/SAlias.json",JSON.stringify(alias))
+            e.reply(`添加成功: ${e.group_id}=>${content}`,true)
+            return
+        }else{
+            e.reply('该功能仅限群管理',true)
+            return
+        }
+    }
     async getMotd(e) {
-        const content = e.message[0].text.slice(6)
-        if (content == "") return
+        var alias = fs.readFileSync("./data/McMotd/SAlias.json")
+        alias = eval("(" + alias + ")")
+        let content = e.message[0].text.slice(6)
+        if (content == "") {
+            if (e.group_id in alias){
+                content = alias[`${e.group_id}`]
+            }
+          }else{
+            e.reply(
+                `用法: #motd [IP Address]\n你可以通过"#mcsadd [IP Address]"来增设本群默认服务器`
+            ,true)
+            return
+          }
         let ip = content.substring(0, content.indexOf(":"))
         let port = content.replace(content.substring(0, content.indexOf(":") + 1), "")
         if (port == content) {
@@ -72,9 +116,10 @@ export class McMotd extends plugin {
                 type = res.modinfo.type
             }
             const message = [
-                segment.image(`${serverimg}`),
+                segment.image(serverimg),
                 `${desc1}`,
-                `\n----\n[版本] ${res.version.name}`,
+                `\n----\n[IP] ${content}`,
+                `\n[版本] ${res.version.name}`,
                 `\n[协议] ${res.version.protocol}`,
                 `\n[类型] ${type}`,
                 `\n[玩家] ${res.players.online}/${res.players.max}`,
@@ -97,9 +142,10 @@ export class McMotd extends plugin {
                 desc3 = desc2.replace(/\u00a7+\w/g, "")
             }
             const message = [
-                segment.image(`${serverimg}`),
+                segment.image(serverimg),
                 `${desc3}`,
-                `\n----\n[版本] ${res.version.name}`,
+                `\n----\n[IP] ${content}`,
+                `\n[版本] ${res.version.name}`,
                 `\n[协议] ${res.version.protocol}`,
                 `\n[类型] ${type}`,
                 `\n[玩家] ${res.players.online}/${res.players.max}`,
