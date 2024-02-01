@@ -69,12 +69,12 @@ export class McMotd extends plugin {
         if (content == "") {
             if (e.group_id in alias){
                 content = alias[`${e.group_id}`]
+            }else{
+                e.reply(
+                    `用法: #motd [IP Address]\n你可以通过"#mcsadd [IP Address]"来增设本群默认服务器`
+                ,true)
+                return
             }
-          }else{
-            e.reply(
-                `用法: #motd [IP Address]\n你可以通过"#mcsadd [IP Address]"来增设本群默认服务器`
-            ,true)
-            return
           }
         let ip = content.substring(0, content.indexOf(":"))
         let port = content.replace(content.substring(0, content.indexOf(":") + 1), "")
