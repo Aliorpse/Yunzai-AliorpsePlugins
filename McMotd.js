@@ -52,13 +52,13 @@ export class McMotd extends plugin {
             e.reply('该功能仅限群聊',true)
             return
         }
-        if((e.sender.role == "admin" || e.sender.role == "owner")) {
+        if((e.sender.role == "admin" || e.sender.role == "owner" || e.isMaster)) {
             alias[`${e.group_id}`] = content
             fs.writeFileSync("./data/McMotd/SAlias.json",JSON.stringify(alias))
             e.reply(`添加成功: ${e.group_id}=>${content}`,true)
             return
         }else{
-            e.reply('该功能仅限群管理',true)
+            e.reply('该功能仅限群管理或主人',true)
             return
         }
     }
