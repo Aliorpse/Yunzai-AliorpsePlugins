@@ -96,7 +96,7 @@ export class McMotd extends plugin {
 
         res = await res.json()
 
-        if (res.online == "false"){
+        if (res.online == false){
             e.reply(`错误: 服务器不在线\n查询IP: ${content}`,true)
             return false
         }
