@@ -119,11 +119,11 @@ export class McMotd extends plugin {
             segment.image(serverImg),
             res.motd.clean,
             `\n----\n[IP] ${content}`,
+            `\n[玩家] ${res.players.online}/${res.players.max}`,
             `\n[版本] ${res.version.name_clean}`,
             `\n[协议] ${res.version.protocol}`,
             `\n[SRV记录] ${srvRecord}`,
             `\n[Mojang屏蔽] ${eulaBlocked}`,
-            `\n[玩家] ${res.players.online}/${res.players.max}`,
             `\n[请求耗时] ${ping}s`,
         ]
 
