@@ -93,13 +93,12 @@ export class McMotd extends plugin {
     }
 
     async getMotd(e) {
-
-        let res = ""
+        
         var alias = fs.readFileSync("./data/McMotd/SAlias.json")
         var mode = fs.readFileSync("./data/McMotd/config.json")
         alias = eval("(" + alias + ")")
         mode = eval("(" + mode + ")")
-        let serverType = mds.mode
+        let serverType = mode.mds
         let content = e.message[0].text.slice(6)
 
         if (content == "") {
@@ -114,22 +113,25 @@ export class McMotd extends plugin {
         }
 
             let startime = performance.now()
-            res = await fetch(`https://api.mcstatus.io/v2/status/${mode.mds}/` + content)
+            let res = await fetch(`https://api.mcstatus.io/v2/status/${mode.mds}/` + content)
             if (!res) { return false }
             res = await res.json()
+
+
 
             if(res.online == false) {
                 if (mode.mds == "Java"){
                     res = await fetch(`https://api.mcstatus.io/v2/status/bedrock/` + content)
                     serverType = "bedrock"
+                    res = await res.json()
                 }else{
                     res = await fetch(`https://api.mcstatus.io/v2/status/java/` + content)
                     serverType = "java"
+                    res = await res.json()
                 }
             }
 
             let time = ((performance.now() - startime)/1000).toFixed(2)
-            res = await res.json()
             
             if(res.online == false){
                 e.reply(`所查的服务器不在线\n查询IP: ${content}`,true)
@@ -138,31 +140,31 @@ export class McMotd extends plugin {
 
             if(serverType == "java"){
 
+                let srvRecord = "无"
+                let serverImg = ""
+                let eulaBlocked = "否"
+
                 if (res.icon == null) {
-                    let serverImg = "https://api.mcstatus.io/v2/icon"
+                    serverImg = "https://api.mcstatus.io/v2/icon"
                     }else{
-                        let serverImg = res.icon.replace(/data:image\/png;base64,/, "base64://")
+                        serverImg = res.icon.replace(/data:image\/png;base64,/, "base64://")
                     }
     
                 if (res.srv_record != null) {
-                    let srvRecord = res.srv_record.host + ":" + res.srv_record.port
-                }else{
-                    let srvRecord = "无"
+                    srvRecord = res.srv_record.host + ":" + res.srv_record.port
                 }
             
                 if (res.eula_blocked == true) {
-                    let eulaBlocked = "是"
-                }else{
-                    let eulaBlocked = "否"
+                    eulaBlocked = "是"
                 }
     
                 const message = [
                     segment.image(serverImg),
                     res.motd.clean,
-                    `\n----\n[IP] ${content}`,
+                    `\n----`,
+                    `\n[IP] ${content}`,
                     `\n[玩家] ${res.players.online}/${res.players.max}`,
-                    `\n[版本] ${res.version.name_clean}`,
-                    `\n[协议] ${res.version.protocol}`,
+                    `\n[版本] ${serverType} | ${res.version.name_clean}[${res.version.protocol}]`,
                     `\n[SRV记录] ${srvRecord}`,
                     `\n[Mojang屏蔽] ${eulaBlocked}`,
                     `\n[请求耗时] ${time}s`,
@@ -171,22 +173,25 @@ export class McMotd extends plugin {
                 e.reply(message,true)
 
             }else{
-                
+
+                let eulaBlocked = "否"
+
                 if (res.eula_blocked == true) {
-                    let eulaBlocked = "是"
-                }else{
-                    let eulaBlocked = "否"
+                    eulaBlocked = "是"
                 }
 
                 const message = [
                     res.motd.clean,
-                    `\n----\n[IP] ${content}`,
+                    `\n----`,
+                    `\n[IP] ${content}`,
                     `\n[玩家] ${res.players.online}/${res.players.max}`,
-                    `\n[版本] ${res.version.name}`,
-                    `\n[协议] ${res.version.protocol}`,
+                    `\n[版本] ${serverType} | ${res.version.name}[${res.version.protocol}]`,
                     `\n[Mojang屏蔽] ${eulaBlocked}`,
                     `\n[请求耗时] ${time}s`,
                 ]
+
+                e.reply(message,true)
+
             }
 
         return true
