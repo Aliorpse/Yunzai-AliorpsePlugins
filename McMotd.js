@@ -94,15 +94,12 @@ export class McMotd extends plugin {
 
     async getMotd(e) {
 
-        let startime = ""
-        let time = ""
-        let eulaBlocked = "否"
-        let srvRecord = "无"
-        let serverImg = ""
         let res = ""
         var alias = fs.readFileSync("./data/McMotd/SAlias.json")
         var mode = fs.readFileSync("./data/McMotd/config.json")
         alias = eval("(" + alias + ")")
+        mode = eval("(" + mode + ")")
+        let serverType = mds.mode
         let content = e.message[0].text.slice(6)
 
         if (content == "") {
@@ -116,116 +113,61 @@ export class McMotd extends plugin {
             }
         }
 
-        async function onlineCheck(res) {
+            res = await fetch(`https://api.mcstatus.io/v2/status/${mode.mds}/` + content)
+            if (!res) { return false }
+            res = await res.json()
 
-            if (res.online == false){
+            if(res.online == false) {
+                if (mode.mds == "Java"){
+                    res = await fetch(`https://api.mcstatus.io/v2/status/bedrock/` + content)
+                    serverType = "bedrock"
+                }else{
+                    res = await fetch(`https://api.mcstatus.io/v2/status/java/` + content)
+                    serverType = "java"
+                }
+            }
+
+            res = await res.json()
+            
+            if(res.online == false){
+                e.reply(`所查的服务器不在线\n查询IP: ${content}`,true)
                 return false
-            }else{
-                return true
             }
 
-        }
+            if(serverType == "java"){
 
-        async function javaJsonParse(res) {
-
-            if (res.icon == null) {
-                serverImg = "https://api.mcstatus.io/v2/icon"
-            }else{
-                serverImg = res.icon.replace(/data:image\/png;base64,/, "base64://")
-            }
+                if (res.icon == null) {
+                    serverImg = "https://api.mcstatus.io/v2/icon"
+                    }else{
+                        let serverImg = res.icon.replace(/data:image\/png;base64,/, "base64://")
+                    }
     
-            if (res.srv_record != null) {
-                srvRecord = res.srv_record.host + ":" + res.srv_record.port
-            }
-            
-            if (res.eula_blocked == true) {
-                eulaBlocked = "是"
-            }
-    
-            const message = [
-                segment.image(serverImg),
-                res.motd.clean,
-                `\n----\n[IP] ${content}`,
-                `\n[玩家] ${res.players.online}/${res.players.max}`,
-                `\n[版本] ${res.version.name_clean}`,
-                `\n[协议] ${res.version.protocol}`,
-                `\n[SRV记录] ${srvRecord}`,
-                `\n[Mojang屏蔽] ${eulaBlocked}`,
-                `\n[请求耗时] ${time}s`,
-            ]
-    
-            e.reply(message,true)
-
-        }
-
-        async function bedrockJsonParse(res) {
-            e.reply(`仍在开发`)
-        }
-
-        if (mode == "Java") {
-
-            startime = performance.now()
-            res = await fetch("https://api.mcstatus.io/v2/status/java/" + content)
-            if (!res) { return false }
-            res = await res.json()
-
-            if (onlineCheck(res) == true){
-
-                time = ((performance.now() - startime) / 1000).toFixed(2)
-                javaJsonParse(res)
-
-            }else {
-
-                res = await fetch("https://api.mcstatus.io/v2/status/bedrock/" + content)
-
-                if (!res) { return false }
-                res = await res.json()
-
-                if (res.online == false){
-
-                    e.reply(`查询的服务器不在线(IP: ${content})`,true)
-                    return false
-
-                }else {
-
-                    time = ((performance.now() - startime) / 1000).toFixed(2)
-                    bedrockJsonParse(res)
-
+                if (res.srv_record != null) {
+                    let srvRecord = res.srv_record.host + ":" + res.srv_record.port
                 }
-                
-            }
-        }else {
             
-            startime = performance.now()
-            res = await fetch("https://api.mcstatus.io/v2/status/bedrock/" + content)
-            if (!res) { return false }
-            res = await res.json()
-
-            if (onlineCheck(res) == true){
-
-                time = ((performance.now() - startime) / 1000).toFixed(2)
-                bedrockJsonParse(res)
+                if (res.eula_blocked == true) {
+                    let eulaBlocked = "是"
+                }
+    
+                const message = [
+                    segment.image(serverImg),
+                    res.motd.clean,
+                    `\n----\n[IP] ${content}`,
+                    `\n[玩家] ${res.players.online}/${res.players.max}`,
+                    `\n[版本] ${res.version.name_clean}`,
+                    `\n[协议] ${res.version.protocol}`,
+                    `\n[SRV记录] ${srvRecord}`,
+                    `\n[Mojang屏蔽] ${eulaBlocked}`,
+                    `\n[请求耗时] ${time}s`,
+                ]
+    
+                e.reply(message,true)
 
             }else{
-                res = await fetch("https://api.mcstatus.io/v2/status/java/" + content)
-
-                if (!res) { return false }
-                res = await res.json()
-
-                if (res.online == false){
-
-                    e.reply(`查询的服务器不在线(IP: ${content})`,true)
-                    return false
-
-                }else {
-
-                    time = ((performance.now() - startime) / 1000).toFixed(2)
-                    javaJsonParse(res)
-
-                }
 
             }
-        }
+
         return true
     }
 }
