@@ -113,6 +113,7 @@ export class McMotd extends plugin {
             }
         }
 
+            let startime = performance.now()
             res = await fetch(`https://api.mcstatus.io/v2/status/${mode.mds}/` + content)
             if (!res) { return false }
             res = await res.json()
@@ -127,6 +128,7 @@ export class McMotd extends plugin {
                 }
             }
 
+            let time = ((performance.now() - startime)/1000).toFixed(2)
             res = await res.json()
             
             if(res.online == false){
@@ -137,17 +139,21 @@ export class McMotd extends plugin {
             if(serverType == "java"){
 
                 if (res.icon == null) {
-                    serverImg = "https://api.mcstatus.io/v2/icon"
+                    let serverImg = "https://api.mcstatus.io/v2/icon"
                     }else{
                         let serverImg = res.icon.replace(/data:image\/png;base64,/, "base64://")
                     }
     
                 if (res.srv_record != null) {
                     let srvRecord = res.srv_record.host + ":" + res.srv_record.port
+                }else{
+                    let srvRecord = "无"
                 }
             
                 if (res.eula_blocked == true) {
                     let eulaBlocked = "是"
+                }else{
+                    let eulaBlocked = "否"
                 }
     
                 const message = [
@@ -165,9 +171,25 @@ export class McMotd extends plugin {
                 e.reply(message,true)
 
             }else{
+                
+                if (res.eula_blocked == true) {
+                    let eulaBlocked = "是"
+                }else{
+                    let eulaBlocked = "否"
+                }
 
+                const message = [
+                    res.motd.clean,
+                    `\n----\n[IP] ${content}`,
+                    `\n[玩家] ${res.players.online}/${res.players.max}`,
+                    `\n[版本] ${res.version.name}`,
+                    `\n[协议] ${res.version.protocol}`,
+                    `\n[Mojang屏蔽] ${eulaBlocked}`,
+                    `\n[请求耗时] ${time}s`,
+                ]
             }
 
         return true
+        
     }
 }
