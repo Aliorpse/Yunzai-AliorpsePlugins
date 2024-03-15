@@ -10,54 +10,40 @@ import _ from 'lodash'
 import { segment } from "oicq"
 import fetch from 'node-fetch'
 
+/** 指令正则 */
+const regex = /^#mcinfo(.*)/
 export class McInfo extends plugin {
-  constructor () {
-    super({
-      name: 'McInfo',
-      dsc: '获取mc正版玩家信息',
-      event: 'message',
-      priority: 5000,
-      rule: [
-        {
-          /** 命令正则匹配 */
-          reg: '#mcinfo',
-          /** 执行方法 */
-          fnc: 'getInfo'
-        }
-      ]
-    })
-  }
+    constructor() {
+        super({
+            name: 'McInfo',
+            dsc: '获取mc正版玩家信息',
+            event: 'message',
+            priority: 5000,
+            rule: [
+                {
+                    reg: regex,
+                    fnc: 'getInfo'
+                }
+            ]
+        })
+    }
 
-  async getInfo (e) {
-    const content = e.message[0].text.slice(8)
-    if (content == "") {
-      e.reply(
-        `用法:#mcinfo [PlayerName]`
-      ,true)
-      return
+    async getInfo(e) {
+        /** 提取需要查询用户的名称 */
+        const content = e.msg.match(regex)[1].replace(/\s/g, '')
+        if (!content) return e.reply('用法:#mcinfo [PlayerName]', true) // 输入为空提示
+
+        /** 从接口获取数据 */
+        const urlData = await (await fetch("https://playerdb.co/api/player/minecraft/" + content)).json()
+        if (!urlData) { return false } // 接口返回异常继续向下
+        if (!urlData['success']) return e.reply(`错误:${urlData['message']}`) // 接口success数据返回false结束并返回提示
+
+        /** 获取皮肤并处理数据 */
+        const skin = (await (await fetch(`http://minecraft-api.com/api/skins/${urlData.data.player.username}/body/10.5/10/10/25/3`)).text()).replace(/<img src="data:image\/png\;base64, /, "").replace(/" alt="Minecraft-API.com skin player" \/>/, "")
+        e.reply([`MC正版玩家查询\n----`,
+            `\n[玩家] ${urlData.data.player.username}`,
+            `\n[UUID] ${urlData.data.player.id}`,
+            `\n[皮肤]`,
+            segment.image(`base64://${skin}`)], true) // 发送结果
     }
-    let res = await fetch("https://playerdb.co/api/player/minecraft/"+content, {
-      headers:{
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
-    }
-    })
-    if (!res) { return false }
-    res = await res.json()
-    if(res.code == "player.found"){
-      let skin = await fetch(`http://minecraft-api.com/api/skins/${res.data.player.username}/body/10.5/10/10/25/3`)
-      skin = await skin.text();
-      skin = skin.replace(/<img src="data:image\/png\;base64, /,"").replace(/" alt="Minecraft-API.com skin player" \/>/, "")
-      const message = [
-        `MC正版玩家查询\n----`,
-        `\n[玩家] ${res.data.player.username}`,
-        `\n[UUID] ${res.data.player.id}`,
-        `\n[皮肤]`,
-        segment.image(`base64://${skin}`),
-      ]
-      e.reply(message,true)
-    }else{
-      if(res.message == "Mojang API lookup failed.") e.reply("错误: 未找到该玩家",true)
-      else e.reply("错误: "+ res.message,true)
-    }
-  }
 }
