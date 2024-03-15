@@ -13,6 +13,9 @@ import { segment } from "oicq"
 import fetch from 'node-fetch'
 import fs from "fs"
 
+const regexMotd = /^#motd(.*)/
+const regexAdd = /^#mcsadd(.*)/
+const regexMds = /^#mds(.*)/
 
 if (!fs.existsSync("./data/McMotd/SAlias.json")) {
     fs.mkdirSync("./data/McMotd")
@@ -32,15 +35,15 @@ export class McMotd extends plugin {
             priority: 5000,
             rule: [
                 {
-                    reg: '#motd',
+                    reg: regexMotd,
                     fnc: 'getMotd'
                 },
                 {
-                    reg: '#mcsadd',
+                    reg: regexAdd,
                     fnc: 'addAlias'
                 },
                 {
-                    reg: '#mds',
+                    reg: regexMds,
                     fnc: 'prioritySwitch'
                 }
             ]
@@ -50,7 +53,8 @@ export class McMotd extends plugin {
 
         var mode = fs.readFileSync("./data/McMotd/config.json")
         mode = eval("(" + mode + ")")
-        const content = e.message[0].text.slice(5)
+
+        const content = e.msg.match(regexMds)[1].replace(/\s/g, '')
 
         if (content == "Java" || content == "Bedrock" || content == "java" || content == "bedrock") {
             mode["mds"] = content
@@ -68,7 +72,8 @@ export class McMotd extends plugin {
 
         var alias = fs.readFileSync("./data/McMotd/SAlias.json")
         alias = eval("(" + alias + ")")
-        const content = e.message[0].text.slice(8)
+
+        const content = e.msg.match(regexAdd)[1].replace(/\s/g, '')
 
         if (content == "") {
             e.reply('用法: #mcsadd [IP Address],仅限群聊',true)
@@ -99,7 +104,8 @@ export class McMotd extends plugin {
         alias = eval("(" + alias + ")")
         mode = eval("(" + mode + ")")
         let serverType = mode.mds
-        let content = e.message[0].text.slice(6)
+        
+        const content = e.msg.match(regexMotd)[1].replace(/\s/g, '')
 
         if (content == "") {
             if (e.group_id in alias){
