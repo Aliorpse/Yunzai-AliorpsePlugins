@@ -1,5 +1,7 @@
 # Yunzai-McPlugins / MC插件
 
+https://gitee.com/Aliorpse/firefly-plugin
+
 #### 介绍
 
 适用于Yunzai-Bot v3的Minecraft相关功能插件库
