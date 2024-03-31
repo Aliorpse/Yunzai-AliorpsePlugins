@@ -5,7 +5,7 @@
 使用教程:
 #mcinfo [Name] / 获取Java正版玩家信息
 */
-import plugin from '../../lib/plugins/plugin.js'
+import plugin from '../../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import { segment } from "oicq"
 import fetch from 'node-fetch'
@@ -39,10 +39,11 @@ export class McInfo extends plugin {
         if (!urlData['success']) return e.reply(`错误:${urlData['message']}`) // 接口success数据返回false结束并返回提示
 
         /** 获取皮肤并处理数据 */
+        let skin = ""
         try{
-            const skin = (await (await fetch(`http://minecraft-api.com/api/skins/${urlData.data.player.username}/body/10.5/10/10/25/3`)).text()).replace(/<img src="data:image\/png\;base64, /, "").replace(/" alt="Minecraft-API.com skin player" \/>/, "")
+            skin = (await (await fetch(`http://minecraft-api.com/api/skins/${urlData.data.player.username}/body/10.5/10/10/25/3`)).text()).replace(/<img src="data:image\/png\;base64, /, "").replace(/" alt="Minecraft-API.com skin player" \/>/, "")
         }catch(err){
-            return e.reply("错误: 解析失败",true)
+            return e.reply("错误: 解析失败\n" + err,true)
         }
         e.reply([`MC正版玩家查询\n----`,
             `\n[玩家] ${urlData.data.player.username}`,
