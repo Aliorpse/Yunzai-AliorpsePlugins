@@ -39,11 +39,16 @@ export class McInfo extends plugin {
         if (!urlData['success']) return e.reply(`错误:${urlData['message']}`) // 接口success数据返回false结束并返回提示
 
         /** 获取皮肤并处理数据 */
-        const skin = (await (await fetch(`http://minecraft-api.com/api/skins/${urlData.data.player.username}/body/10.5/10/10/25/3`)).text()).replace(/<img src="data:image\/png\;base64, /, "").replace(/" alt="Minecraft-API.com skin player" \/>/, "")
+        try{
+            const skin = (await (await fetch(`http://minecraft-api.com/api/skins/${urlData.data.player.username}/body/10.5/10/10/25/3`)).text()).replace(/<img src="data:image\/png\;base64, /, "").replace(/" alt="Minecraft-API.com skin player" \/>/, "")
+        }catch(err){
+            return e.reply("错误: 解析失败",true)
+        }
         e.reply([`MC正版玩家查询\n----`,
             `\n[玩家] ${urlData.data.player.username}`,
             `\n[UUID] ${urlData.data.player.id}`,
             `\n[皮肤]`,
             segment.image(`base64://${skin}`)], true) // 发送结果
+            return
     }
 }
