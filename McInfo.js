@@ -5,7 +5,7 @@
 使用教程:
 #mcinfo [Name] / 获取Java正版玩家信息
 */
-import plugin from '../../../lib/plugins/plugin.js'
+import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import { segment } from "oicq"
 import fetch from 'node-fetch'
