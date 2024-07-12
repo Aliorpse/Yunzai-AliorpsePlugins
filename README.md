@@ -1,6 +1,6 @@
 # Yunzai-McPlugins / MC插件
 
-https://gitee.com/Aliorpse/firefly-plugin
+# [请使用这个插件,本仓库停止更新](https://gitee.com/Aliorpse/firefly-plugin)
 
 #### 介绍
 
