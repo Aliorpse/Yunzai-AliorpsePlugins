@@ -7,7 +7,7 @@ export class Intercept extends plugin {
     super({
       name: 'MsgProcess',
       dsc: '处理消息',
-      event: 'message',
+      event: '*',
       priority: Number.NEGATIVE_INFINITY
     })
   }
@@ -15,6 +15,7 @@ export class Intercept extends plugin {
   mergeTextElements(arr) {
     let result = []
     let tempText = ''
+    if(Array(arr).length == 1){ return arr }
     for (let i = 0; i < arr.length; i++) {
       if (typeof arr[i] === 'string') {
         tempText += arr[i]
@@ -41,6 +42,7 @@ export class Intercept extends plugin {
       if(args.includes(true)){
         return reply((this.mergeTextElements(...args)),true)
       }
+      logger.info()
       return reply(this.mergeTextElements(...args))
     }
   }
