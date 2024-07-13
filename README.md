@@ -1,6 +1,6 @@
 # Yunzai-AliorpsePlugins
 
-我的另一个插件[Firefly-plugin](https://gitee.com/Aliorpse/firefly-plugin)
+我的另一个插件[Firefly-plugin](https://gitee.com/Aliorpse/firefly-plugin), 包含本仓库原minecraft相关功能
 
 #### 介绍
 
