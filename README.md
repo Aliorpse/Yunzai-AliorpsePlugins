@@ -1,10 +1,8 @@
-# Yunzai-McPlugins / MC插件
-
-# [请使用这个插件,本仓库停止更新](https://gitee.com/Aliorpse/firefly-plugin)
+# Yunzai-AliorpsePlugins
 
 #### 介绍
 
-适用于Yunzai-Bot v3的Minecraft相关功能插件库
+依照个人yunzai使用习惯所写的插件库
 
 #### 安装教程
 
@@ -13,11 +11,6 @@
 #### 使用说明
 
 详见各js插件内部注释
-
-#### 须知
-
-1.  学业繁忙,Issue与PR不及时回
-2.  McMotd.js使用api.mcstatus.io
 
 #### 参与贡献
 1.  Fork 本仓库
