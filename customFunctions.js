@@ -50,7 +50,7 @@ export class custom extends plugin {
       let i = 0
       while (i < array.length) {
         if (array[i].includes("\\n")) {
-          array[i] = array[i].replace("\\n", "\n")
+          array[i] = array[i].replace(/\\n/g, "\n")
         }
         i += 1
       }
