@@ -1,5 +1,7 @@
 # Yunzai-AliorpsePlugins
 
+我的另一个插件[Firefly-plugin](https://gitee.com/Aliorpse/firefly-plugin)
+
 #### 介绍
 
 依照个人yunzai使用习惯所写的插件库,可能实用
