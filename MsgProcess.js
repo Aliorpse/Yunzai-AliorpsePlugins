@@ -15,7 +15,7 @@ export class Intercept extends plugin {
   mergeTextElements(arr) {
     let result = []
     let tempText = ''
-    if(Array(arr).length == 1){ return arr }
+    if(arr.length == undefined){ return arr }
     for (let i = 0; i < arr.length; i++) {
       if (typeof arr[i] === 'string') {
         tempText += arr[i]
@@ -27,9 +27,11 @@ export class Intercept extends plugin {
         result.push(arr[i])
       }
     }
+  
     if (tempText) {
       result.push(tempText)
     }
+  
     return result
   }
 
@@ -42,7 +44,6 @@ export class Intercept extends plugin {
       if(args.includes(true)){
         return reply((this.mergeTextElements(...args)),true)
       }
-      logger.info()
       return reply(this.mergeTextElements(...args))
     }
   }
