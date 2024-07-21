@@ -1,6 +1,6 @@
 /**
  * 轻量，快速的b站视频解析插件
- * 通过匹配BV号和b23.tv短链获取视频数据
+ * 通过匹配BV号,av号,b23.tv短链获取视频数据
  * 返回360p原视频和视频相关信息
  */
 
@@ -9,6 +9,7 @@ import _ from 'lodash'
 
 const regB23 = /b23\.tv\/\w{7}/
 const regBV = /BV1\w{9}/
+const regAV = /av\d+/
 
 function formatNumber(num) {
     if(num < 10000){
@@ -18,7 +19,7 @@ function formatNumber(num) {
     }
 }
 
-export class custom extends plugin {
+export class bilitv extends plugin {
     constructor(){
         super({
             name: "bilitv",
@@ -33,16 +34,36 @@ export class custom extends plugin {
                 {
                     reg: regB23,
                     fnc: "jiexi"
+                },
+                {
+                    reg: regAV,
+                    fnc: "jiexi"
                 }
             ]
         })
     }
 
     async jiexi(e){
-
-        if(e.msg.includes("点赞" && "投币")){ return true }
-
         let bvid = ""
+        if(e.msg.match(regAV)){
+            let table = 'fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF'
+            let tr = {}
+            for (let i = 0; i < 58; i++) { tr[table[i]] = i }
+            const s = [11, 10, 3, 8, 4, 6]
+            const xor = 177451812
+            const add = 8728348608
+            let x = (regAV.exec(e.msg))[0].replace(/av/g,"")
+            x = (x ^ xor) + add
+            const r = Array.from('BV1  4 1 7  ')
+            for (let i = 0; i < 6; i++) {
+                r[s[i]] = table[Math.floor(x / 58 ** i) % 58]
+            }
+            bvid = r.join("")
+            if(!(bvid.match(regBV))){
+                return true
+            }
+        }
+        if(e.msg.includes("点赞" && "投币")){ return true }
         if(e.msg.match(regB23)){
             try{
                 bvid = regBV.exec((await fetch("https://"+regB23.exec(e.msg))).url)
@@ -55,7 +76,9 @@ export class custom extends plugin {
                 return true
             }
         }else{
-            bvid = regBV.exec(e.msg)
+            if(bvid == ""){
+                bvid = regBV.exec(e.msg)
+            }
         }
         let res = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`,{
             headers: {
