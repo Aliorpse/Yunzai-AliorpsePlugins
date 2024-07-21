@@ -1,5 +1,8 @@
 /**
  * 我的世界 多功能服务器状态查询 支持基岩,Java,可以添加群聊默认服务器
+ * #motd [Address]
+ * #mcsadd [Address]
+ * #mds [Java/Bedrock]
  */
 
 import plugin from '../../lib/plugins/plugin.js'
