@@ -1,5 +1,7 @@
 /**
  * 轻量，快速的b站视频解析插件
+ * 通过匹配BV号和b23.tv短链获取视频数据
+ * 返回360p原视频和视频相关信息
  */
 
 import plugin from '../../lib/plugins/plugin.js'
