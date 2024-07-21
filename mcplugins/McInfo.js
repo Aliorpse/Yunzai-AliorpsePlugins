@@ -2,15 +2,13 @@
  * 我的世界正版玩家信息查询插件
  * #motd [PlayerName]
  */
-import plugin from '../../../lib/plugins/plugin.js'
+
+import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
-import { segment } from "oicq"
 import fetch from 'node-fetch'
 
-logger.info("firefly-plugin >> McInfo.js 加载完成")
-
-/** 指令正则 */
 const regex = /^#mcinfo(.*)/
+
 export class McInfo extends plugin {
     constructor() {
         super({
@@ -36,8 +34,7 @@ export class McInfo extends plugin {
         const urlData = await (await fetch("https://api.mojang.com/users/profiles/minecraft/" + content)).json()
         if (!urlData) { return false } // 接口返回异常继续向下
         if (urlData.hasOwnProperty("errorMessage")){
-            e.reply(`Error: ${urlData.errorMessage}`,true)
-            return false
+            return e.reply(`Error: ${urlData.errorMessage}`,true)
         }
 
         /** 获取皮肤并处理数据 */
@@ -48,11 +45,8 @@ export class McInfo extends plugin {
         }catch(err){
             return e.reply("错误: 解析失败\n" + err,true)
         }
-        e.reply([`MC正版玩家查询\n----`,
-            `\n[玩家] ${urlData.name}`,
-            `\n[UUID] ${urlData.id}`,
-            `\n[皮肤]`,
+        e.reply([`MC正版玩家查询\n----\n[玩家] ${urlData.name}\n[UUID] ${urlData.id}\n[皮肤]`,
             segment.image(`base64://${skin}`)], true) // 发送结果
-            return
+            return true
     }
 }
