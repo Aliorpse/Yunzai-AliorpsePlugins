@@ -1,14 +1,12 @@
 # Yunzai-AliorpsePlugins
 
-我的另一个插件[Firefly-plugin](https://gitee.com/Aliorpse/firefly-plugin), 包含本仓库原minecraft相关功能
-
 #### 介绍
 
-依照个人yunzai使用习惯所写的插件库,可能实用
+依照个人yunzai使用习惯所写的插件库
 
 #### 安装教程
 
-下载js文件并移动到yunzai-bot/example目录下
+下载js文件并移动到yunzai/plugins/example目录下
 
 #### 使用说明
 
