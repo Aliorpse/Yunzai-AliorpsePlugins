@@ -104,6 +104,7 @@ export class McMotd extends plugin {
             message.push(segment.image(serverImg))
         }
         message.push(res.motd.clean,`\n---\n[IP] ${content}`)
+        logger.info(res)
         if(isJava){
             let srvRecord = '无'
             if (res.srv_record != null) {
@@ -116,7 +117,7 @@ export class McMotd extends plugin {
         }else{
             message.push(`\n[版本] Bedrock | ${res.version.name}[${res.version.protocol}]`)
         }
-        message.push(`\n[请求耗时] ${time}s`)
+        message.push(`\n[玩家]${res.players.online}/${res.players.max}\n[请求耗时] ${time}s`)
         e.reply(message,true)
         return true
     }
