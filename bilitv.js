@@ -2,6 +2,8 @@
  * 轻量，快速的b站视频解析插件
  * 通过匹配BV号,av号,b23.tv短链获取视频数据
  * 返回360p原视频和视频相关信息
+ * 
+ * 这个插件要求你的ffmpeg所在的文件夹在PATH环境变量中
  */
 
 import plugin from '../../lib/plugins/plugin.js'
