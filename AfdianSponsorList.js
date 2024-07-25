@@ -10,7 +10,7 @@
  * 你的所有爱发电订单需要群u在订单留言里填QQ号,这样才会被计入数据库
  * 你的所有爱发电订单需要群u在订单留言里填QQ号,这样才会被计入数据库
  * 
- * 考虑到用户没有公网IP，本插件采用
+ * 考虑到用户没有公网IP，本插件采用手动http get获取形式更新列表(#更新赞助)
  * 
  * 这个插件的拓展性很强，如果你有需要对此插件进行拓展或者单独定制修改，欢迎联系QQ3521766148
  */
@@ -30,18 +30,18 @@ const regList = /^#赞助(名单|列表)(.*)/
 const regAdd = /^#spadd(.*)/
 const regRefresh = /^#更新赞助(.*)/
 
-if (!fs.existsSync("./data/SponsorList/users.json")) {
+if (!fs.existsSync("./data/SponsorList/users.json")) { //数据文件
     fs.mkdirSync("./data/SponsorList")
     fs.writeFileSync("./data/SponsorList/users.json","{}")
 }
 
-function calculateMD5Hash(inputString) {
+function calculateMD5Hash(inputString) { //爱发电 请求时用的签名计算
     const md5Hash = crypto.createHash('md5')
     md5Hash.update(inputString, 'utf-8')
     return md5Hash.digest('hex')
   }
 
-function createSign(inputString) {
+function createSign(inputString) { //套公式
     const time = Math.floor(Date.now() / 1000)
     const params = inputString
     const md5 = calculateMD5Hash(`${token}params${params}ts${time}user_id${uid}`)
@@ -94,7 +94,7 @@ export class sponsor extends plugin {
                 message.push(`\n-${list[key][1][0]} | ${list[key][1][1]}元`)
             }
         }
-        all = all.toFixed(2)
+        all = all.toFixed(2) //all计算完成,tofixed()是淡化js的不精准计算导致的误差
         message[0] = listLine1
         message.push(listLine2)
         e.reply(message)
