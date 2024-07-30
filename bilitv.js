@@ -1,7 +1,7 @@
 /**
- * 轻量，快速的b站视频解析插件
- * 通过匹配BV号,av号,b23.tv短链获取视频数据
- * 返回360p原视频和视频相关信息
+ * 轻量，快速的b站解析插件
+ * 通过匹配BV号,av号,b23.tv短链,epid,ssid,md获取数据
+ * 返回360p原视频和相关信息(番剧则只返回信息)
  * 
  * 这个插件要求你的ffmpeg所在的文件夹在PATH环境变量中
  */
@@ -12,6 +12,9 @@ import _ from 'lodash'
 const regB23 = /b23\.tv\/\w{7}/
 const regBV = /BV1\w{9}/
 const regAV = /av\d+/
+const regMD = /md\d+/ // media_id 番剧md号
+const regSS = /ss\d+/ // season_id 番剧id
+const regEP = /ep\d+/ // episode_id 番剧剧集编号
 
 function formatNumber(num) {
     if(num < 10000){
@@ -25,27 +28,39 @@ export class bilitv extends plugin {
     constructor(){
         super({
             name: "bilitv",
-            dsc: "b站视频解析",
+            dsc: "b站解析",
             event: "message",
-            priority: 5000,
+            priority: -114514,
             rule:[
                 {
                     reg: regBV,
-                    fnc: "jiexi"
-                },
-                {
-                    reg: regB23,
-                    fnc: "jiexi"
+                    fnc: "jxsp"
                 },
                 {
                     reg: regAV,
-                    fnc: "jiexi"
+                    fnc: "jxsp"
+                },
+                {
+                    reg: regB23,
+                    fnc: "jxsp"
+                },
+                {
+                    reg: regSS,
+                    fnc: "jxfj"
+                },
+                {
+                    reg: regMD,
+                    fnc: "jxfj"
+                },
+                {
+                    reg: regEP,
+                    fnc: "jxfj"
                 }
             ]
         })
     }
 
-    async jiexi(e){
+    async jxsp(e){
         let bvid = ""
         if(e.msg.match(regAV)){
             let table = 'fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF'
@@ -78,9 +93,7 @@ export class bilitv extends plugin {
                 return true
             }
         }else{
-            if(bvid == ""){
-                bvid = regBV.exec(e.msg)
-            }
+            bvid = regBV.exec(e.msg)
         }
         let res = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`,{
             headers: {
@@ -90,11 +103,9 @@ export class bilitv extends plugin {
         })
         res = await res.json()
         if(res.code != 0){
-            e.reply("解析失败\n信息:" + res.message)
+            return e.reply("解析失败\n信息:" + res.message)
         }else{
-            e.reply([
-                segment.image(res.data.pic),`${res.data.title}\nhttps://www.bilibili.com/video/${bvid}\n作者: ${res.data.owner.name}\n播放: ${formatNumber(res.data.stat.view)} | 弹幕: ${formatNumber(res.data.stat.danmaku)}\n点赞: ${formatNumber(res.data.stat.like)} | 投币: ${formatNumber(res.data.stat.coin)}\n收藏: ${formatNumber(res.data.stat.favorite)} | 评论: ${formatNumber(res.data.stat.reply)}`
-            ],true)
+            e.reply([segment.image(res.data.pic),`${res.data.title}\nhttps://www.bilibili.com/video/${bvid}\n作者: ${res.data.owner.name}\n播放: ${formatNumber(res.data.stat.view)} | 弹幕: ${formatNumber(res.data.stat.danmaku)}\n点赞: ${formatNumber(res.data.stat.like)} | 投币: ${formatNumber(res.data.stat.coin)}\n收藏: ${formatNumber(res.data.stat.favorite)} | 评论: ${formatNumber(res.data.stat.reply)}`],true)
         }
         res = await fetch(`https://api.bilibili.com/x/player/playurl?avid=${res.data.aid}&cid=${res.data.cid}&qn=16&type=mp4&platform=html5`,{
             headers: {
@@ -113,6 +124,61 @@ export class bilitv extends plugin {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'
             }
         })).arrayBuffer())))
+        return true
+    }
+
+
+    async jxfj(e){
+        let epid = ""
+        let ssid = ""
+        if(!(e.msg.match(regEP))){
+            if(e.msg.match(regMD)){
+                try{
+                    let temp = await (await fetch(`https://api.bilibili.com/pgc/review/user?media_id=${(regMD.exec(e.msg))[0].replace("md", "")}`,{
+                        headers: {
+                            'referer': 'https://www.bilibili.com/',
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'
+                        }
+                    })).json()
+                    if(temp.code != 0){
+                        return e.reply("解析失败\n信息:" + temp.message)
+                    }
+                    ssid = temp.result.media.season_id
+                }catch(e){
+                    e.reply("解析失败")
+                    return true
+                }
+            }else{
+                ssid = (regSS.exec(e.msg))[0].replace("ss", "")
+            }
+            let temp = await (await fetch(`https://api.bilibili.com/pgc/web/season/section?season_id=${ssid}`,{
+                headers: {
+                    'referer': 'https://www.bilibili.com/',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'
+                }
+            })).json()
+            if(temp.code != 0){
+                return e.reply("解析失败\n信息:" + temp.message)
+            }
+            epid = (temp.result.main_section.episodes[0].share_url).replace("https://www.bilibili.com/bangumi/play/ep","")
+        }else{
+            epid = (regEP.exec(e.msg))[0].replace("ep", "")
+        }
+        let res = await (await fetch(`https://api.bilibili.com/pgc/view/web/season?ep_id=${epid}`,{
+            headers: {
+                'referer': 'https://www.bilibili.com/',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'
+            }
+        })).json()
+        if(res.code != 0){
+            return e.reply("解析失败\n信息:" + res.message)
+        }
+        e.reply([
+            segment.image(res.result.cover),
+            segment.text(`${res.result.title}\n${res.result.link}\n播放: ${formatNumber(res.result.stat.views)} | 弹幕: ${formatNumber(res.result.stat.danmakus)}\n点赞: ${formatNumber(res.result.stat.likes)} | 投币: ${formatNumber(res.result.stat.coins)}\n追番: ${formatNumber(res.result.stat.favorites)} | 收藏: ${formatNumber(res.result.stat.favorite)}\n`),
+            segment.text("---\n"),
+            segment.text(`${res.result.new_ep.desc}, ${res.result.seasons[0].new_ep.index_show}`)
+        ],true)
         return true
     }
 }
