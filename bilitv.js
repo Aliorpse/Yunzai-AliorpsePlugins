@@ -83,7 +83,7 @@ export class bilitv extends plugin {
         if(e.msg.includes("点赞" && "投币")){ return true }
         if(e.msg.match(regB23)){
             try{
-                bvid = regBV.exec((await fetch("https://"+regB23.exec(e.msg))).url)
+                bvid = regBV.exec((await fetch("https://"+(regB23.exec(e.msg)[0]).replace(/\\/g,""))).url)
                 if(bvid == null){
                     e.reply("解析失败",true)
                     return true
@@ -131,6 +131,7 @@ export class bilitv extends plugin {
     async jxfj(e){
         let epid = ""
         let ssid = ""
+        if(e.msg.includes("点赞" && "投币")){ return true }
         if(!(e.msg.match(regEP))){
             if(e.msg.match(regMD)){
                 try{
@@ -175,9 +176,9 @@ export class bilitv extends plugin {
         }
         e.reply([
             segment.image(res.result.cover),
-            segment.text(`${res.result.title}\n${res.result.link}\n播放: ${formatNumber(res.result.stat.views)} | 弹幕: ${formatNumber(res.result.stat.danmakus)}\n点赞: ${formatNumber(res.result.stat.likes)} | 投币: ${formatNumber(res.result.stat.coins)}\n追番: ${formatNumber(res.result.stat.favorites)} | 收藏: ${formatNumber(res.result.stat.favorite)}\n`),
-            segment.text("---\n"),
-            segment.text(`${res.result.new_ep.desc}, ${res.result.seasons[0].new_ep.index_show}`)
+            `${res.result.title}\n评分: ${res.result.rating.score} / ${res.result.rating.count}\n${res.result.new_ep.desc}, ${res.result.seasons[0].new_ep.index_show}\n`,
+            "---\n",
+            `${res.result.link}\n播放: ${formatNumber(res.result.stat.views)} | 弹幕: ${formatNumber(res.result.stat.danmakus)}\n点赞: ${formatNumber(res.result.stat.likes)} | 投币: ${formatNumber(res.result.stat.coins)}\n追番: ${formatNumber(res.result.stat.favorites)} | 收藏: ${formatNumber(res.result.stat.favorite)}\n`
         ],true)
         return true
     }
