@@ -7,7 +7,7 @@ export class Intercept extends plugin {
     super({
       name: 'MsgProcess',
       dsc: '处理消息',
-      event: '*',
+      event: 'message',
       priority: Number.NEGATIVE_INFINITY
     })
   }
