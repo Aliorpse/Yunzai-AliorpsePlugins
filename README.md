@@ -4,16 +4,13 @@
 
 依照个人yunzai使用习惯所写的插件库
 
-#### 安装教程
+#### 安装与使用
 
-下载js文件并移动到yunzai/plugins/example目录下
+- 安装: 下载js文件并移动到Yunzai/plugins/example目录下
+- 用法: 详见各js插件内部注释
 
-#### 使用说明
+#### 未来可能会填补的功能
+如果你对这些功能有需要，请发个issue来催更
+- bilitv.js - 分析更多的b23.tv短链类型而不止于视频
+- bilitv.js - 解析直播链接，个人资料链接
 
-详见各js插件内部注释
-
-#### 参与贡献
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
