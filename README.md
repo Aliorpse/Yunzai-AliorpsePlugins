@@ -1,8 +1,6 @@
 # Yunzai-AliorpsePlugins
 
-#### 介绍
-
-依照个人yunzai使用习惯所写的插件库
+依照个人Yunzai使用习惯所写的插件库
 
 #### 安装与使用
 
