@@ -1,6 +1,6 @@
 /**
  * 我的世界正版玩家信息查询插件
- * #motd [PlayerName]
+ * #mcinfo [PlayerName]
  */
 
 import plugin from '../../lib/plugins/plugin.js'
