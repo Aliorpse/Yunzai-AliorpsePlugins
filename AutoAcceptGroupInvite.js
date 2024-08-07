@@ -1,10 +1,10 @@
 /**
- * 自动同意群申请，没别的了
- * 与yunzai功能搭配使用
+ * 根据AfdianSponsorList.js的用户列表自动同意群申请，不在则拒绝
  */
 
 import _ from 'lodash'
 import plugin from '../../lib/plugins/plugin.js'
+import fs from "fs"
 
 export class AutoAccept extends plugin {
     constructor() {
@@ -17,7 +17,12 @@ export class AutoAccept extends plugin {
     }
 
     async accept(e){
-        e.approve(true)
+        const list = JSON.parse(fs.readFileSync("./data/SponsorList/users.json"))
+        if(list.hasOwnProperty(e.user_id) || e.isMaster){
+            e.approve(true)
+        }else{
+            e.approve(false)
+        }
         return true
     }
 }
