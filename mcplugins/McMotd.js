@@ -2,12 +2,14 @@
  * 我的世界 多功能服务器状态查询 支持基岩,Java,可以添加群聊默认服务器
  * #motd [Address]
  * #mcsadd [Address]
+ * 默认需要安装一个额外字体，在开源仓库下的fonts文件夹
  */
 
 import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import fetch from 'node-fetch'
 import fs from "fs"
+import puppeteer from "puppeteer";
 
 const regexMotd = /^#motd(.*)/
 const regexAdd = /^#mcsadd(.*)/
@@ -17,8 +19,7 @@ if (!fs.existsSync("./data/McMotd/SAlias.json")) {
     fs.writeFileSync("./data/McMotd/SAlias.json","{}")
 }
 
-let alias = fs.readFileSync("./data/McMotd/SAlias.json")
-alias = eval("(" + alias + ")")
+let alias = ""
 
 export class McMotd extends plugin {
     constructor() {
@@ -82,6 +83,7 @@ export class McMotd extends plugin {
             e.reply("不支持查询回环地址")
             return true
         }
+        e.reply(`正在查询[${content}],请稍后`,false,{ recallMsg: 10 })
         let startime = performance.now()
         let res = await (await fetch(`https://api.mcstatus.io/v2/status/java/` + content)).json()
         if(res.online == false) {
@@ -93,32 +95,79 @@ export class McMotd extends plugin {
             e.reply(`所查的服务器不在线\n查询IP: ${content}`,true)
             return false
         }
-        const message = []
+        let serverVersion;
         if(isJava){
-            let serverImg = ''
-            if (res.icon == null) {
-                serverImg = "https://api.mcstatus.io/v2/icon"
-            }else{
-                serverImg = res.icon.replace(/data:image\/png;base64,/, "base64://")
-            }
-            message.push(segment.image(serverImg))
-        }
-        message.push(res.motd.clean,`\n---\n[IP] ${content}`)
-        logger.info(res)
-        if(isJava){
-            let srvRecord = '无'
-            if (res.srv_record != null) {
-                srvRecord = res.srv_record.host + ":" + res.srv_record.port
-            }
-            message.push(`\n[SRV记录] ${srvRecord}`)
-        }
-        if(isJava){
-            message.push(`\n[版本] Java | ${res.version.name_clean}[${res.version.protocol}]`)
+            serverVersion = `Java | ${res.version.name_clean}[${res.version.protocol}]`
         }else{
-            message.push(`\n[版本] Bedrock | ${res.version.name}[${res.version.protocol}]`)
+            serverVersion = `Bedrock | ${res.version.name}[${res.version.protocol}]`
         }
-        message.push(`\n[玩家]${res.players.online}/${res.players.max}\n[请求耗时] ${time}s`)
-        e.reply(message,true)
+        let html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .body {
+            width: 1000px;
+            height: 160px;
+            border-radius: 20px;
+        }
+        .box {
+            display: flex;
+            align-items: center;
+            width: 1000px;
+            height: 160px;
+            background-image: url("favicon.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            border-radius: 10px;
+        }
+        .icon {
+            margin-left: 16px;
+            border-radius: 20px;
+        }
+        .text {
+            font-family: "阿里巴巴普惠体",sans-serif;
+            flex-grow: 1;
+            color: white;
+            font-size: 26px;
+            padding-left: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+            white-space: pre;
+        }
+    </style>
+</head>
+<body class="body">
+    <div class="box">
+        <img class="icon" src="favicon.jpg" alt="icon" width="128" height="128">
+        <p class="text">${(res.motd.html).replace("\n","<br>").replace(/\n/g,"")}
+IP: <span style="text-decoration: underline;">${content}</span> | 请求耗时: ${time}s
+在线: ${res.players.online}/${res.players.max} | ${serverVersion}</p>
+    </div>
+</body>
+</html>
+`       
+        if(isJava){
+            if (res.icon == null) {
+                html = html.replace(/favicon.jpg/g,"https://api.mcstatus.io/v2/icon")
+            }else{
+                html = html.replace(/favicon.jpg/g, res.icon)
+            }
+        }else{
+            html = html.replace("margin-left: 16px;","margin-left: 16px;display: none;")
+        }
+        fs.writeFileSync("./data/McMotd/temp.html",html)
+        const browser = await puppeteer.launch({args: ['--no-sandbox','--disable-setuid-sandbox'] })
+        const page = await browser.newPage()
+        await page.goto("C:/Users/Administrator/Desktop/Yunzai/data/McMotd/temp.html")
+        const boundingBox = await (await page.$('body')).boundingBox();
+        await page.setViewport({
+            width: Math.ceil(boundingBox.width+15),
+            height: Math.ceil(boundingBox.height+15)
+        })
+        const image = Buffer.from(await page.screenshot())
+        e.reply(segment.image(image),true)
         return true
     }
 }
