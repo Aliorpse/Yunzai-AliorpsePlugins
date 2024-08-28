@@ -97,9 +97,9 @@ export class McMotd extends plugin {
         }
         let serverVersion;
         if(isJava){
-            serverVersion = `Java | ${res.version.name_clean}[${res.version.protocol}]`
+            serverVersion = `Java - ${res.version.name_clean}[${res.version.protocol}]`
         }else{
-            serverVersion = `Bedrock | ${res.version.name}[${res.version.protocol}]`
+            serverVersion = `Bedrock - ${res.version.name}[${res.version.protocol}]`
         }
         let html = `<!DOCTYPE html>
 <html lang="en">
@@ -160,7 +160,7 @@ IP: <span style="text-decoration: underline;">${content}</span> | 请求耗时: 
         fs.writeFileSync("./data/McMotd/temp.html",html)
         const browser = await puppeteer.launch({args: ['--no-sandbox','--disable-setuid-sandbox'] })
         const page = await browser.newPage()
-        await page.goto("C:/Users/Administrator/Desktop/Yunzai/data/McMotd/temp.html")
+        await page.goto(process.cwd() + "/data/McMotd/temp.html")
         const boundingBox = await (await page.$('body')).boundingBox();
         await page.setViewport({
             width: Math.ceil(boundingBox.width+15),
