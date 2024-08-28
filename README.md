@@ -5,7 +5,8 @@
 
 #### 安装与使用
 
-- 安装: 下载js文件并移动到Yunzai/plugins/example目录下
+- 安装: 下载js文件并移动到Yunzai/plugins/example目录下<br>
+  `curl -o "./plugins/example/McMotd.js" "https://gitee.com/Aliorpse/Yunzai-AliorpsePlugins/raw/master/[本仓库文件路径]"`
 - 用法: 详见各js插件内部注释
 
 #### 未来可能会填补的功能
