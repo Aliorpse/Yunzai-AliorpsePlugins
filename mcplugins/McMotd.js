@@ -160,7 +160,7 @@ IP: <span style="text-decoration: underline;">${content}</span> | 请求耗时: 
         fs.writeFileSync("./data/McMotd/temp.html",html)
         const browser = await puppeteer.launch({args: ['--no-sandbox','--disable-setuid-sandbox'] })
         const page = await browser.newPage()
-        await page.goto(process.cwd() + "/data/McMotd/temp.html")
+        await page.goto("file:///" + process.cwd() + "/data/McMotd/temp.html")
         const boundingBox = await (await page.$('body')).boundingBox();
         await page.setViewport({
             width: Math.ceil(boundingBox.width+15),
