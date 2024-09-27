@@ -1,3 +1,5 @@
+### 本项目逐渐迁移到[Karin](https://github.com/KarinJS/Karin),本仓库将注重于维修bug
+### Karin本插件仓库[karin-plugin-alijs](https://github.com/Aliorpse/karin-plugins-alijs/)
 # Yunzai-AliorpsePlugins
 
 依照个人Yunzai使用习惯所写的插件库
