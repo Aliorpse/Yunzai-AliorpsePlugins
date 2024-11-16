@@ -3,8 +3,9 @@ import _ from 'lodash'
 import { Client } from 'osu-web.js'
 import fs from "fs"
 
-const id = "33947"
-const secret = "AsJlBJwMli3tU07tXoffOEklQrZ0SyCSFqdW8Cpd"
+//自行填写id,secret
+const id = "app_id"
+const secret = "app_secret"
 
 if (!fs.existsSync("./data/osuc/token.txt")) {
   fs.mkdirSync("./data/osuc")
