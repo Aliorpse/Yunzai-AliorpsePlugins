@@ -1,19 +1,10 @@
-/**
- * osu玩家信息查询，仍在制作中
- * 请使用pnpm add osu-web.js添加依赖
- * 
- * !ob [id] 绑定个人信息，如"!ob 35996527"
- * !ou (name)? 查询个人信息,接用户名称,不接默认查自己
- * !ap [value] pp模拟计算器,返回加上一个pp的值后绑定账户的rank与加权pp值
- */
-
 import plugin from '../../lib/plugins/plugin.js'
 import _ from 'lodash'
 import { Client } from 'osu-web.js'
 import fs from "fs"
-//下面两项在https://osu.ppy.sh/home/account/edit 的"开放授权"处获取(不用填写回调链接)
-const id = "client id"
-const secret = "client secret"
+
+const id = "33947"
+const secret = "AsJlBJwMli3tU07tXoffOEklQrZ0SyCSFqdW8Cpd"
 
 if (!fs.existsSync("./data/osuc/token.txt")) {
   fs.mkdirSync("./data/osuc")
@@ -121,6 +112,8 @@ export class osu extends plugin {
       } else {
           c = `@` + c
       }
+      
+      if(c == undefined){ return e.reply("你未绑定,输入 !ob [ID] 进行绑定", true)}
 
       c = await fetchUser(c,e)
 
@@ -145,7 +138,7 @@ export class osu extends plugin {
       let pp = await (await e.msg.replace(/^(\!|！)ap/, "")).replace(/ /g, "")
       if (pp == "") { return e.reply("参数不足") }
       let c = users[e.sender?.user_id]
-      if (c == undefined) { return e.reply("你未绑定") }
+      if(c == undefined){ return e.reply("你未绑定,输入 !ob [ID] 进行绑定", true)}
       
       try {
           c = await client.users.getUserScores(c, 'best', {
