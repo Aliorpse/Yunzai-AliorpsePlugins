@@ -23,8 +23,8 @@ import crypto from "crypto"
 const listLine1 = `赞助列表:` //代码中写了展示总总赞助金额的变量all,如有需要可以自行改动代码使用(在这加似乎不行,因为这里未定义)
 const listLine2 = "\n由衷感谢各位的赞助!"  //列表结尾
 
-const uid = "placeholder"  //爱发电user_id
-const token = "placeholder"  //爱发电token
+const uid = "70d1e17aff1511eba06752540025c377"  //爱发电user_id
+const token = "CXkuPg75B3QRrqUA9b4jHn8EeSwhJpaW"  //爱发电token
 
 const regList = /^#赞助(名单|列表)(.*)/
 const regAdd = /^#spadd(.*)/
@@ -73,12 +73,51 @@ export class sponsor extends plugin {
     }
 
     async sponsorAdd(e){
+        if (!e.isMaster) { 
+            e.reply('非主人权限，无法执行该操作')
+            return true 
+        }
+        
+        // 检查消息格式是否正确
+        if (!e.message || e.message.length < 3 || !e.message[1] || !e.message[2]) {
+            e.reply('格式错误，请使用：#spadd @用户 金额')
+            return false
+        }
+
         const list = JSON.parse(fs.readFileSync("./data/SponsorList/users.json"))
-        if(!(e.isMaster)) { return true }
-        list[e.message[1].qq] = [await e.message[1].text.replace('@', ''),(await (e.message[2].text).replace(/ /g,""))]
-        fs.writeFileSync('./data/SponsorList/users.json',JSON.stringify(list))
-        e.reply(`${e.message[1].qq} => ${e.message[2].text}`)
-        return true
+        
+        // 确保消息对象包含所需属性
+        if (!e.message[1].qq || e.message[1].type !== 'at' || !e.message[2].text) {
+            e.reply('消息格式错误，请确保正确 @用户并输入金额')
+            return false
+        }
+
+        try {
+            // 获取被@用户的昵称
+            let username = e.message[1].qq
+            try {
+                const member = e.group.pickMember(e.message[1].qq)
+                username = member.card || member.nickname || e.message[1].qq
+            } catch (err) {
+                // 获取昵称失败时静默使用QQ号
+            }
+            
+            const amount = e.message[2].text.trim()
+            
+            // 验证金额是否为有效数字
+            if (isNaN(amount)) {
+                e.reply('请输入有效的金额数字')
+                return false
+            }
+
+            list[e.message[1].qq] = [username, amount]
+            fs.writeFileSync('./data/SponsorList/users.json', JSON.stringify(list))
+            e.reply(`已添加赞助记录：${username}(${e.message[1].qq}) => ${amount}元`)
+            return true
+        } catch (err) {
+            e.reply('添加赞助信息失败：' + err.message)
+            return false
+        }
     }
 
     async showList(e){
