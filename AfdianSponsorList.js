@@ -23,8 +23,8 @@ import crypto from "crypto"
 const listLine1 = `赞助列表:` //代码中写了展示总总赞助金额的变量all,如有需要可以自行改动代码使用(在这加似乎不行,因为这里未定义)
 const listLine2 = "\n由衷感谢各位的赞助!"  //列表结尾
 
-const uid = "70d1e17aff1511eba06752540025c377"  //爱发电user_id
-const token = "CXkuPg75B3QRrqUA9b4jHn8EeSwhJpaW"  //爱发电token
+const uid = "UserID"  //爱发电user_id
+const token = "Token"  //爱发电token
 
 const regList = /^#赞助(名单|列表)(.*)/
 const regAdd = /^#spadd(.*)/
