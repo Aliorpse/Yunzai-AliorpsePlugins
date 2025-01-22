@@ -4,7 +4,7 @@
  */
 import plugin from '../../lib/plugins/plugin.js'
 
-const delay = 200 //如果有时无法屏蔽多个回复,适当增加这个值,单位毫秒
+const delay = 400 //如果有时无法屏蔽多个回复,适当增加这个值,单位毫秒
 
 export class singleReply extends plugin {
     static delaySet = new Set()
