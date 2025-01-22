@@ -1,6 +1,7 @@
 /**
+ * 该插件已被TRSS-Yunzai原生功能代替(yunzai/config/config/group.yml 群CD)
+ * 
  * 本插件用于解决一个群内多个同后端yunzai机器人对同一条指令的重复响应问题
- * 截止目前，这个插件依赖报错工作，所以报错是正常的，如果有不报错解决问题的办法欢迎PR!
  */
 import plugin from '../../lib/plugins/plugin.js'
 
@@ -20,7 +21,7 @@ export class singleReply extends plugin {
 
         if (!e.isGroup) { return true }
         if (singleReply.delaySet.has(e.group_id)) {
-            return this.skip() //这里阻断消息继续处理,会导致报错,自己测试return false无法阻断(this.skip()无任何意义)
+            return "return"
         }
 
         singleReply.delaySet.add(e.group_id)
